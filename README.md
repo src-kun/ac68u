@@ -177,7 +177,15 @@ ipset restore -f /opt/etc/ipset.conf
 
 - iptables
 
-ssup.sh
+iptablest 开机自动加载iptables的ss代理规则，第一次设置完iptables规则后保存到`iptables-save > /opt/etc/iptables.conf`，开机自动加载规则/opt/etc/init.d/S21iptables 
+```bash
+#!/bin/sh
+
+iptables-restore /opt/etc/iptables.conf
+```
+- 快捷脚本
+
+ssup.sh 开启ss全局
 ```bash
 #!/bin/bash
 
@@ -223,7 +231,7 @@ iptables -t nat -A PREROUTING -s 192.168/16 -j SHADOWSOCKS
 iptables -t nat -A POSTROUTING -s 192.168/16 -j MASQUERADE
 ```
 
-ssdown
+ssdown 关闭ss全局
 ```bash
 #!/bin/bash
 
@@ -232,13 +240,6 @@ iptables -t nat -D OUTPUT -p tcp -j SHADOWSOCKS
 iptables -t nat -F SHADOWSOCKS
 iptables -t nat -X SHADOWSOCKS
 ipset destroy cidr_cn
-```
-
-iptablest 开机自动加载iptables的ss代理规则，第一次设置完iptables规则后保存到`iptables-save > /opt/etc/iptables.conf`，开机自动加载规则/opt/etc/init.d/S21iptables 
-```bash
-#!/bin/sh
-
-iptables-restore /opt/etc/iptables.conf
 ```
 
 ## 更新
