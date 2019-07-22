@@ -87,7 +87,7 @@ opkg install shadowsocks redsocks chinadns
 
 ```
 
-opkg安装ss后会自动加入开机启动中/opt/etc/init.d/S22shadowsocks无需改动，新建/opt/etc/init.d/S22sstunnel开机自启动ss-tunnel，ss-tunnel用于转发dns查询，开启代理后所有dns全部都走5353端口：
+opkg安装ss后会自动加入开机启动中/opt/etc/init.d/S22shadowsocks无需改动，新建/opt/etc/init.d/S22sstunnel开机自启动ss-tunnel，ss-tunnel用于转发dns查询，开启代理后所有国外站dns全部都走5353端口：
 ```bash
 #!/bin/sh
 
