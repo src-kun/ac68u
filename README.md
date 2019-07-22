@@ -234,7 +234,7 @@ iptables -t nat -X SHADOWSOCKS
 ipset destroy cidr_cn
 ```
 
-iptablest /opt/etc/init.d/S21iptables 第一次设置完iptables规则后保存到`iptables-save > /opt/etc/iptables.conf`，开机自动加载规则
+iptablest 开机自动加载iptables的ss代理规则，第一次设置完iptables规则后保存到`iptables-save > /opt/etc/iptables.conf`，开机自动加载规则/opt/etc/init.d/S21iptables 
 ```bash
 #!/bin/sh
 
