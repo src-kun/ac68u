@@ -252,3 +252,5 @@ https://medium.com/@oliviaqrs/%E5%88%A9%E7%94%A8shadowsocks%E6%89%93%E9%80%A0%E5
 https://github.com/RMerl/asuswrt-merlin/wiki/Compile-Firmware-from-source-using-Ubuntu
 
 https://github.com/gygy/asus_factory_image
+
+https://www.yangcs.net/posts/linux-circumvent/
