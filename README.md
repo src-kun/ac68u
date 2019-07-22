@@ -185,10 +185,8 @@ iptables-restore /opt/etc/iptables.conf
 ```
 - 快捷脚本
 
-ssup.sh 开启ss全局
+ssup 开启ss全局
 ```bash
-#!/bin/bash
-
 SOCKS_SERVER=x.x.x.x # SOCKS 服务器的 IP 地址
 # Setup the ipset
 ipset restore -f /opt/etc/ipset.conf
@@ -233,8 +231,6 @@ iptables -t nat -A POSTROUTING -s 192.168/16 -j MASQUERADE
 
 ssdown 关闭ss全局
 ```bash
-#!/bin/bash
-
 iptables -t nat -D OUTPUT -p icmp -j SHADOWSOCKS
 iptables -t nat -D OUTPUT -p tcp -j SHADOWSOCKS
 iptables -t nat -F SHADOWSOCKS
