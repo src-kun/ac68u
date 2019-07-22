@@ -54,7 +54,7 @@ entware-setup.sh
 ```
 rm /tmp/opt
 ln -s /mnt/sda1/entware /tmp/opt
-TODO 下载lib直接复制到文件夹，如果联网不上可以试试先离线安装privoxy
+TODO 下载lib直接复制到文件夹
 ```
 
 ## 3  安装shadowsocks、redsocks、chinadns
@@ -93,7 +93,7 @@ opkg安装ss后会自动加入开机启动中/opt/etc/init.d/S22shadowsocks无�
 
 ENABLED=yes
 PROCS=ss-tunnel
-ARGS="-s ss_server_ip -p 8334 -b 0.0.0.0 -l 5353 -k password -m aes-256-cfb -L 8.8.8.8:53 -u"
+ARGS="-s ss_server_ip -p 8334 -b 127.0.0.1 -l 5353 -k password -m aes-256-cfb -L 8.8.8.8:53 -u"
 PREARGS=""
 DESC=$PROCS
 PATH=/opt/sbin:/opt/bin:/opt/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
