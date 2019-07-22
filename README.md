@@ -1,8 +1,6 @@
 # ac68u
 ac68u ss + chinadns + redsocks 全局ss代理
 
-# ac68u
-
 ## 1  开启华硕原厂JFFS2，开启后重启路由后系统不会还原数据。
 - 开启了SSH后。用SSH登录路由器。
 
@@ -179,25 +177,61 @@ ipset restore -f /opt/etc/ipset.conf
 
 - iptables
 
-x.x.x.x替换自己ss-serverr的ip，访问x.x.x.x时跳过转发否则会死循环，31338是redsocks的端口，路由器的流量都是转发到这个端口，cidr_cn国内ip段，访问国内网站不走代理
+ssup.sh
 ```bash
-iptables -t nat -N shadowsocks
-iptables -t nat -A shadowsocks -d 0/8 -j RETURN
-iptables -t nat -A shadowsocks -d 127/8 -j RETURN
-iptables -t nat -A shadowsocks -d 10/8 -j RETURN
-iptables -t nat -A shadowsocks -d 169.254/16 -j RETURN
-iptables -t nat -A shadowsocks -d 172.16/12 -j RETURN
-iptables -t nat -A shadowsocks -d 192.168/16 -j RETURN
-iptables -t nat -A shadowsocks -d 224/4 -j RETURN
-iptables -t nat -A shadowsocks -d 240/4 -j RETURN
+#!/bin/bash
 
-iptables -t nat -A shadowsocks -d  x.x.x.x -j RETURN
+SOCKS_SERVER=x.x.x.x # SOCKS 服务器的 IP 地址
+# Setup the ipset
+ipset restore -f /opt/etc/ipset.conf
 
-iptables -t nat -A shadowsocks -m set --match-set cidr_cn dst -j RETURN
+# 在nat表中新增一个链，名叫：SHADOWSOCKS
+iptables -t nat -N SHADOWSOCKS
 
-iptables -t nat -A shadowsocks ! -p icmp -j REDIRECT --to-ports 31338
-iptables -t nat -A OUTPUT ! -p icmp -j shadowsocks
-iptables -t nat -A PREROUTING ! -p icmp -j shadowsocks
+# Allow connection to the server
+iptables -t nat -A SHADOWSOCKS -d $SOCKS_SERVER -j RETURN
+
+# Allow connection to reserved networks
+iptables -t nat -A SHADOWSOCKS -d 0.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 10.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 127.0.0.0/8 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 169.254.0.0/16 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 172.16.0.0/12 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 224.0.0.0/4 -j RETURN
+iptables -t nat -A SHADOWSOCKS -d 240.0.0.0/4 -j RETURN
+
+# Allow connection to chinese IPs
+iptables -t nat -A SHADOWSOCKS -p tcp -m set --match-set cidr_cn dst -j RETURN
+# 如果你想对 icmp 协议也实现智能分流，可以加上下面这一条
+iptables -t nat -A SHADOWSOCKS -p icmp -m set --match-set cidr_cn dst -j RETURN
+
+# Redirect to Shadowsocks
+# 把1081改成你的shadowsocks本地端口
+iptables -t nat -A SHADOWSOCKS -p tcp -j REDIRECT --to-port 31338
+# 如果你想对 icmp 协议也实现智能分流，可以加上下面这一条
+iptables -t nat -A SHADOWSOCKS -p icmp -j REDIRECT --to-port 31338
+
+# 将SHADOWSOCKS链中所有的规则追加到OUTPUT链中
+iptables -t nat -A OUTPUT -p tcp -j SHADOWSOCKS
+# 如果你想对 icmp 协议也实现智能分流，可以加上下面这一条
+iptables -t nat -A OUTPUT -p icmp -j SHADOWSOCKS
+
+# 内网流量流经 shadowsocks 规则链
+iptables -t nat -A PREROUTING -s 192.168/16 -j SHADOWSOCKS
+# 内网流量源NAT
+iptables -t nat -A POSTROUTING -s 192.168/16 -j MASQUERADE
+```
+
+ssdown
+```bash
+#!/bin/bash
+
+iptables -t nat -D OUTPUT -p icmp -j SHADOWSOCKS
+iptables -t nat -D OUTPUT -p tcp -j SHADOWSOCKS
+iptables -t nat -F SHADOWSOCKS
+iptables -t nat -X SHADOWSOCKS
+ipset destroy cidr_cn
 ```
 
 iptablest /opt/etc/init.d/S21iptables 第一次设置完iptables规则后保存到`iptables-save > /opt/etc/iptables.conf`，开机自动加载规则
